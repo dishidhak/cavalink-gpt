@@ -1,0 +1,43 @@
+from flask import Flask, request, jsonify import os, json, requests
+
+app = Flask(__name__)
+
+# Environment variables (used later by Docker)
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "tinyllama")
+
+# Load UVA clubs dataset
+with open("assets/clubs.json", "r") as f:
+    CLUBS = json.load(f)
+
+@app.get("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
+
+@app.post("/api/chat")
+def chat():
+    user_text = request.json.get("text", "")
+
+    system_prompt = f"""
+You are CavaLink-GPT, a UVA club recommendation assistant.
+Use the following dataset to suggest clubs:
+{json.dumps(CLUBS)}
+
+Student says: "{user_text}"
+Respond concisely and helpfully.
+"""
+
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": system_prompt
+    }
+
+    # Call the local LLM running through Ollama
+    response = requests.post(f"{OLLAMA_URL}/api/generate", json=payload)
+    reply_text = response.json().get("response", "")
+
+    return jsonify({"reply": reply_text})
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000)
+

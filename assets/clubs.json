@@ -1,0 +1,99 @@
+[
+  {
+    "name": "Indian Student Association (ISA)",
+    "category": "cultural",
+    "tags": ["culture", "south asian", "community", "events"],
+    "description": "A cultural organization celebrating Indian traditions, festivals, and community at UVA."
+  },
+  {
+    "name": "Data Science and Analytics Club (DSAC)",
+    "category": "academic",
+    "tags": ["data science", "analytics", "machine learning", "projects"],
+    "description": "A club focused on data science workshops, analytics competitions, and collaborative ML projects."
+  },
+  {
+    "name": "Girls Who Code (GWC)",
+    "category": "academic",
+    "tags": ["computer science", "coding", "women in STEM", "technology"],
+    "description": "Supports women in technology through coding workshops, mentorship, and community-building events."
+  },
+  {
+    "name": "Women in Computing Sciences (WiCS)",
+    "category": "academic",
+    "tags": ["computer science", "women in tech", "networking", "career"],
+    "description": "Promotes the advancement and empowerment of women in computing through mentorship and events."
+  },
+  {
+    "name": "Alternative Investment Fund (AIF)",
+    "category": "professional",
+    "tags": ["finance", "investing", "private equity", "hedge funds"],
+    "description": "A selective student-run fund focused on alternative investments and financial education."
+  },
+  {
+    "name": "Jefferson Society",
+    "category": "debate",
+    "tags": ["debate", "leadership", "public speaking", "tradition"],
+    "description": "UVA's oldest student organization focused on debate, leadership, and intellectual discussion."
+  },
+  {
+    "name": "Virginia Ke Aashiq (VKA)",
+    "category": "performing arts",
+    "tags": ["dance", "bollywood", "desi", "performance"],
+    "description": "A competitive Bollywood fusion dance team performing at UVA and intercollegiate competitions."
+  },
+  {
+    "name": "Hoo-Raas",
+    "category": "performing arts",
+    "tags": ["dance", "garba", "raas", "south asian", "performance"],
+    "description": "A competitive Garba-Raas team performing traditional South Asian dance styles."
+  },
+  {
+    "name": "SEED Consulting",
+    "category": "professional",
+    "tags": ["consulting", "nonprofit", "projects", "career"],
+    "description": "A student consulting club providing pro-bono consulting services to nonprofit clients."
+  },
+  {
+    "name": "180 Degrees Consulting",
+    "category": "professional",
+    "tags": ["consulting", "social impact", "client work", "career"],
+    "description": "An international consulting organization offering project-based consulting for social impact groups."
+  },
+  {
+    "name": "Virginia Belles",
+    "category": "performing arts",
+    "tags": ["acapella", "singing", "music", "performance"],
+    "description": "An all-female a cappella group performing contemporary music at UVA."
+  },
+  {
+    "name": "Cavalier Marching Band",
+    "category": "performing arts",
+    "tags": ["music", "band", "school spirit", "performance"],
+    "description": "The official marching band of UVA, performing at athletic events and school celebrations."
+  },
+  {
+    "name": "HooHacks",
+    "category": "academic",
+    "tags": ["hackathon", "coding", "technology", "innovation"],
+    "description": "UVA's premier hackathon organization supporting coding events and student innovation."
+  },
+  {
+    "name": "Korean Student Association (KSA)",
+    "category": "cultural",
+    "tags": ["culture", "korean", "events", "community"],
+    "description": "A cultural club celebrating Korean heritage through community events and cultural exchange."
+  },
+  {
+    "name": "Cavalier Daily",
+    "category": "media",
+    "tags": ["journalism", "writing", "photography", "media"],
+    "description": "UVA's independent student newspaper featuring writing, photography, editing, and design opportunities."
+  },
+  {
+    "name": "Club Swim at UVA",
+    "category": "athletics",
+    "tags": ["swimming", "fitness", "sports", "competition"],
+    "description": "A competitive and recreational swim club for students of all levels."
+  }
+]
+
