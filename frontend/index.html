@@ -1,3 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CavaLink-GPT</title>
+
+    <style>
+        body {
+            background: #f5f7fb;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #app {
+            width: 420px;
+            background: white;
+            padding: 24px;
+            border-radius: 14px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #002f6c;
+            margin-top: 0;
+        }
+
+        #messages {
+            height: 260px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            background: #fafafa;
+            margin-bottom: 12px;
+        }
+
+        .msg {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            line-height: 1.4;
+        }
+
+        .user {
+            background: #d6e8ff;
+            align-self: flex-end;
+        }
+
+        .bot {
+            background: #e8e8e8;
+        }
+
+        #input-section {
+            display: flex;
+            gap: 8px;
+        }
+
+        input {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #bbb;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 10px 18px;
+            background: #002f6c;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #003d8a;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <h1>CavaLink-GPT 🔵🟠</h1>
+
+    <div id="messages"></div>
+
+    <div id="input-section">
+        <input id="userInput" type="text" placeholder="Tell me your interests...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
 <script>
     async function sendMessage() {
         const input = document.getElementById("userInput");
@@ -16,24 +117,24 @@
 
             const data = await response.json();
 
-            // Error message from backend
+            // Handle backend error fallback
             if (data.error) {
                 addMessage(data.error, "bot");
                 return;
             }
 
-            // Format the list of clubs nicely
+            // Handle array of clubs
             if (Array.isArray(data)) {
                 let formatted = data
-                    .map(c => `${c.name}: ${c.description}`)
+                    .map(c => `${c.name}:\n${c.description}`)
                     .join("\n\n");
 
                 addMessage(formatted, "bot");
                 return;
             }
 
-            // fallback (should never happen)
-            addMessage("No response.", "bot");
+            // fallback (should not happen)
+            addMessage("No response from server.", "bot");
 
         } catch (e) {
             addMessage("❌ Error connecting to server.", "bot");
@@ -53,3 +154,5 @@
     }
 </script>
 
+</body>
+</html>
