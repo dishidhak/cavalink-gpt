@@ -3,17 +3,12 @@ import json
 import requests
 from flask import Flask, request, jsonify, send_from_directory
 
-# -----------------------------------------------------
-# PATH SETUP
-# -----------------------------------------------------
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 app = Flask(__name__)
 
-# -----------------------------------------------------
-# FRONTEND ROUTES
-# -----------------------------------------------------
+# Serve UI
 @app.get("/")
 def home():
     return send_from_directory(FRONTEND_DIR, "index.html")
@@ -22,115 +17,77 @@ def home():
 def static_files(path):
     return send_from_directory(FRONTEND_DIR, path)
 
-
-# -----------------------------------------------------
-# OLLAMA CONFIG
-# -----------------------------------------------------
+# Ollama
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "tinyllama")
 
-# -----------------------------------------------------
-# LOAD CLUB DATA
-# -----------------------------------------------------
+# Load clubs
 with open(os.path.join(BASE_DIR, "assets/clubs.json"), "r") as f:
     CLUBS = json.load(f)
 
-
 @app.get("/health")
 def health():
-    return jsonify({"status": "ok"}), 200
+    return jsonify({"status": "ok"})
 
 
+# ============================================================
+# NO-HALLUCINATION CLUB MATCHING
+# ============================================================
+KEYWORD_MAP = {
+    "dance": ["Virginia Ke Aashiq (VKA)", "Hoo-Raas"],
+    "korean": ["Korean Student Association (KSA)"],
+    "consulting": ["SEED Consulting", "180 Degrees Consulting"],
+    "coding": ["Girls Who Code (GWC)", "HooHacks"],
+    "data": ["Data Science and Analytics Club (DSAC)"],
+    "music": ["Virginia Belles", "Cavalier Marching Band"],
+    "journalism": ["Cavalier Daily"],
+    "swim": ["Club Swim at UVA"],
+    "finance": ["Alternative Investment Fund (AIF)"],
+    "debate": ["Jefferson Society"],
+    "garba": ["Hoo-Raas"],
+    "raas": ["Hoo-Raas"],
+    "bollywood": ["Virginia Ke Aashiq (VKA)"]
+}
 
-# =====================================================
-# MAIN CHAT ENDPOINT — ZERO HALLUCINATIONS
-# =====================================================
+
 @app.post("/api/chat")
 def chat():
     user_text = request.json.get("text", "").lower().strip()
-    keywords = user_text.split()
+    words = user_text.split()
 
-    # -------------------------------------------------
-    # 1. Deterministic Keyword → Club Mapping
-    # -------------------------------------------------
-    KEYWORD_MAP = {
-        "dance": [
-            "Virginia Ke Aashiq (VKA)",
-            "Hoo-Raas"
-        ],
-        "consulting": [
-            "SEED Consulting",
-            "180 Degrees Consulting"
-        ],
-        "korean": [
-            "Korean Student Association (KSA)"
-        ],
-        "culture": [
-            "Indian Student Association (ISA)",
-            "Korean Student Association (KSA)"
-        ],
-        "data": [
-            "Data Science and Analytics Club (DSAC)"
-        ],
-        "coding": [
-            "Girls Who Code (GWC)",
-            "HooHacks"
-        ],
-        "music": [
-            "Virginia Belles",
-            "Cavalier Marching Band"
-        ],
-        "journalism": [
-            "Cavalier Daily"
-        ],
-        "swim": [
-            "Club Swim at UVA"
-        ],
-        # fallback synonyms
-        "south": ["Virginia Ke Aashiq (VKA)", "Hoo-Raas"],
-        "bollywood": ["Virginia Ke Aashiq (VKA)"],
-        "garba": ["Hoo-Raas"],
-        "raas": ["Hoo-Raas"],
-        "finance": ["Alternative Investment Fund (AIF)"],
-        "debate": ["Jefferson Society"]
-    }
+    selected = []
 
-    # Find matching clubs
-    selected_names = []
-
-    for word in keywords:
-        if word in KEYWORD_MAP:
-            selected_names = KEYWORD_MAP[word]
+    # match keyword → clubs
+    for w in words:
+        if w in KEYWORD_MAP:
+            selected = KEYWORD_MAP[w]
             break
 
-    # Fallback: choose the most general club
-    if not selected_names:
-        selected_names = ["Indian Student Association (ISA)"]
+    # fallback recommendation
+    if not selected:
+        selected = ["Indian Student Association (ISA)"]
 
-    # Convert names → full club objects
-    selected_clubs = [c for c in CLUBS if c["name"] in selected_names]
+    # convert names → full club dict
+    club_objs = [c for c in CLUBS if c["name"] in selected]
 
+    # ============================================================
+    # MODEL PROMPT — ONLY EXPLAIN CLUBS PYTHON SELECTED
+    # ============================================================
+    club_list_text = "\n".join([f"- {c['name']}: {c['description']}" for c in club_objs])
 
-    # -------------------------------------------------
-    # 2. Build TinyLlama Prompt — ONLY Explain Clubs
-    # -------------------------------------------------
     prompt = f"""
 You are CavaLink-GPT.
 
-Your ONLY job is to write SHORT explanations (1–2 sentences) for the EXACT UVA clubs listed below.
+Your job: Write VERY SHORT explanations (1 sentence) ONLY for these UVA clubs:
 
-STRICT RULES:
-- DO NOT invent any clubs.
-- DO NOT add clubs not listed.
-- DO NOT modify names.
-- ONLY explain the clubs provided.
+{club_list_text}
 
-User interests: "{user_text}"
+RULES:
+- Do NOT add extra clubs.
+- Do NOT modify names.
+- Do NOT list anything else.
+- Output format EXACTLY:
 
-Clubs to explain:
-{json.dumps(selected_clubs, indent=2)}
-
-Output formatting (EXACTLY):
 Club Name: explanation.
 Club Name: explanation.
 """
@@ -141,27 +98,20 @@ Club Name: explanation.
         "stream": False
     }
 
-    # -------------------------------------------------
-    # 3. Call TinyLlama Safely
-    # -------------------------------------------------
     try:
         response = requests.post(f"{OLLAMA_URL}/api/generate", json=payload)
-        data = response.json()
-        reply_text = data.get("response", "").strip()
+        reply = response.json().get("response", "").strip()
 
         return jsonify({
-            "reply": reply_text,
-            "clubs_used": selected_clubs
+            "reply": reply,
+            "clubs_used": club_objs
         })
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-
-# -----------------------------------------------------
-# RUN FLASK
-# -----------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
 
