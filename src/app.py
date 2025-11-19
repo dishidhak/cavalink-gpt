@@ -43,76 +43,106 @@ def health():
 
 
 # =====================================================
-# MAIN CHAT ENDPOINT
+# MAIN CHAT ENDPOINT — ZERO HALLUCINATIONS
 # =====================================================
 @app.post("/api/chat")
 def chat():
-    user_text = request.json.get("text", "").lower()
-    user_words = user_text.split()
+    user_text = request.json.get("text", "").lower().strip()
+    keywords = user_text.split()
 
     # -------------------------------------------------
-    # 1. FILTER CLUBS BY KEYWORDS
+    # 1. Deterministic Keyword → Club Mapping
     # -------------------------------------------------
-    matched = []
-    for club in CLUBS:
-        score = 0
+    KEYWORD_MAP = {
+        "dance": [
+            "Virginia Ke Aashiq (VKA)",
+            "Hoo-Raas"
+        ],
+        "consulting": [
+            "SEED Consulting",
+            "180 Degrees Consulting"
+        ],
+        "korean": [
+            "Korean Student Association (KSA)"
+        ],
+        "culture": [
+            "Indian Student Association (ISA)",
+            "Korean Student Association (KSA)"
+        ],
+        "data": [
+            "Data Science and Analytics Club (DSAC)"
+        ],
+        "coding": [
+            "Girls Who Code (GWC)",
+            "HooHacks"
+        ],
+        "music": [
+            "Virginia Belles",
+            "Cavalier Marching Band"
+        ],
+        "journalism": [
+            "Cavalier Daily"
+        ],
+        "swim": [
+            "Club Swim at UVA"
+        ],
+        # fallback synonyms
+        "south": ["Virginia Ke Aashiq (VKA)", "Hoo-Raas"],
+        "bollywood": ["Virginia Ke Aashiq (VKA)"],
+        "garba": ["Hoo-Raas"],
+        "raas": ["Hoo-Raas"],
+        "finance": ["Alternative Investment Fund (AIF)"],
+        "debate": ["Jefferson Society"]
+    }
 
-        for word in user_words:
-            if any(word in tag.lower() for tag in club["tags"]):
-                score += 3
-            if word in club["description"].lower():
-                score += 2
-            if word in club["name"].lower():
-                score += 1
+    # Find matching clubs
+    selected_names = []
 
-        if score > 0:
-            matched.append((score, club))
+    for word in keywords:
+        if word in KEYWORD_MAP:
+            selected_names = KEYWORD_MAP[word]
+            break
 
-    matched.sort(reverse=True, key=lambda x: x[0])
-    filtered_clubs = [club for score, club in matched][:3]
+    # Fallback: choose the most general club
+    if not selected_names:
+        selected_names = ["Indian Student Association (ISA)"]
 
-    if not filtered_clubs:
-        filtered_clubs = CLUBS[:2]
+    # Convert names → full club objects
+    selected_clubs = [c for c in CLUBS if c["name"] in selected_names]
 
 
     # -------------------------------------------------
-    # 2. SYSTEM PROMPT (STRICT RULES)
+    # 2. Build TinyLlama Prompt — ONLY Explain Clubs
     # -------------------------------------------------
-    system_prompt = """
-You are CavaLink-GPT, an assistant that recommends UVA clubs.
+    prompt = f"""
+You are CavaLink-GPT.
 
-RULES:
-1. ONLY choose from the clubs listed below—never invent clubs.
-2. Recommend the top 2–3 clubs that best match the user’s interests.
-3. Keep explanations short (1–2 sentences).
-4. Output format (exactly):
+Your ONLY job is to write SHORT explanations (1–2 sentences) for the EXACT UVA clubs listed below.
 
-Club Name: Short explanation.
-Club Name: Short explanation.
-"""
-
-    # -------------------------------------------------
-    # 3. FULL PROMPT SENT TO TINYLLAMA
-    # -------------------------------------------------
-    full_prompt = f"""
-{system_prompt}
+STRICT RULES:
+- DO NOT invent any clubs.
+- DO NOT add clubs not listed.
+- DO NOT modify names.
+- ONLY explain the clubs provided.
 
 User interests: "{user_text}"
 
-Available clubs you may choose from:
-{json.dumps(filtered_clubs, indent=2)}
+Clubs to explain:
+{json.dumps(selected_clubs, indent=2)}
 
-Now follow the RULES and produce clean recommendations.
+Output formatting (EXACTLY):
+Club Name: explanation.
+Club Name: explanation.
 """
 
     payload = {
         "model": OLLAMA_MODEL,
-        "prompt": full_prompt,
+        "prompt": prompt,
         "stream": False
     }
 
     # -------------------------------------------------
-    # 4. CALL TINYLLAMA
+    # 3. Call TinyLlama Safely
     # -------------------------------------------------
     try:
         response = requests.post(f"{OLLAMA_URL}/api/generate", json=payload)
@@ -121,7 +151,7 @@ Now follow the RULES and produce clean recommendations.
 
         return jsonify({
             "reply": reply_text,
-            "filtered_clubs_used": filtered_clubs
+            "clubs_used": selected_clubs
         })
 
     except Exception as e:
