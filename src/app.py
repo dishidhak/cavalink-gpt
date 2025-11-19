@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 from flask import Flask, request, jsonify, send_from_directory
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -17,10 +16,6 @@ def home():
 def static_files(path):
     return send_from_directory(FRONTEND_DIR, path)
 
-# Ollama
-OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "tinyllama")
-
 # Load clubs
 with open(os.path.join(BASE_DIR, "assets/clubs.json"), "r") as f:
     CLUBS = json.load(f)
@@ -29,10 +24,9 @@ with open(os.path.join(BASE_DIR, "assets/clubs.json"), "r") as f:
 def health():
     return jsonify({"status": "ok"})
 
-
-# ============================================================
-# NO-HALLUCINATION CLUB MATCHING
-# ============================================================
+# ===============================
+# NO-LLM, NO-HALLUCINATION MATCHING
+# ===============================
 KEYWORD_MAP = {
     "dance": ["Virginia Ke Aashiq (VKA)", "Hoo-Raas"],
     "korean": ["Korean Student Association (KSA)"],
@@ -49,67 +43,33 @@ KEYWORD_MAP = {
     "bollywood": ["Virginia Ke Aashiq (VKA)"]
 }
 
-
 @app.post("/api/chat")
 def chat():
     user_text = request.json.get("text", "").lower().strip()
     words = user_text.split()
 
-    selected = []
+    matched = []
 
-    # match keyword → clubs
+    # Determine matching clubs
     for w in words:
         if w in KEYWORD_MAP:
-            selected = KEYWORD_MAP[w]
+            matched = KEYWORD_MAP[w]
             break
 
-    # fallback recommendation
-    if not selected:
-        selected = ["Indian Student Association (ISA)"]
+    # Fallback if nothing matched
+    if not matched:
+        return jsonify({"error": "no clubs that match your description"}), 200
 
-    # convert names → full club dict
-    club_objs = [c for c in CLUBS if c["name"] in selected]
+    # Return ONLY club names + descriptions
+    output = [
+        {
+            "name": c["name"],
+            "description": c["description"]
+        }
+        for c in CLUBS if c["name"] in matched
+    ]
 
-    # ============================================================
-    # MODEL PROMPT — ONLY EXPLAIN CLUBS PYTHON SELECTED
-    # ============================================================
-    club_list_text = "\n".join([f"- {c['name']}: {c['description']}" for c in club_objs])
-
-    prompt = f"""
-You are CavaLink-GPT.
-
-Your job: Write VERY SHORT explanations (1 sentence) ONLY for these UVA clubs:
-
-{club_list_text}
-
-RULES:
-- Do NOT add extra clubs.
-- Do NOT modify names.
-- Do NOT list anything else.
-- Output format EXACTLY:
-
-Club Name: explanation.
-Club Name: explanation.
-"""
-
-    payload = {
-        "model": OLLAMA_MODEL,
-        "prompt": prompt,
-        "stream": False
-    }
-
-    try:
-        response = requests.post(f"{OLLAMA_URL}/api/generate", json=payload)
-        reply = response.json().get("response", "").strip()
-
-        return jsonify({
-            "reply": reply,
-            "clubs_used": club_objs
-        })
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+    return jsonify(output)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
