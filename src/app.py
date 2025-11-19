@@ -3,14 +3,17 @@ import json
 import requests
 from flask import Flask, request, jsonify, send_from_directory
 
+# -----------------------------------------------------
+# PATH SETUP
+# -----------------------------------------------------
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 
 app = Flask(__name__)
 
-# --------------------
+# -----------------------------------------------------
 # FRONTEND ROUTES
-# --------------------
+# -----------------------------------------------------
 @app.get("/")
 def home():
     return send_from_directory(FRONTEND_DIR, "index.html")
@@ -20,62 +23,87 @@ def static_files(path):
     return send_from_directory(FRONTEND_DIR, path)
 
 
-# Use localhost during local development
-# (Docker will override this with environment variables later)
+# -----------------------------------------------------
+# OLLAMA CONFIG
+# -----------------------------------------------------
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "tinyllama")
 
-# Load UVA club dataset
-with open("assets/clubs.json", "r") as f:
+# -----------------------------------------------------
+# LOAD CLUB DATA
+# -----------------------------------------------------
+with open(os.path.join(BASE_DIR, "assets/clubs.json"), "r") as f:
     CLUBS = json.load(f)
+
 
 @app.get("/health")
 def health():
     return jsonify({"status": "ok"}), 200
 
 
+
+# =====================================================
+# MAIN CHAT ENDPOINT
+# =====================================================
 @app.post("/api/chat")
 def chat():
     user_text = request.json.get("text", "").lower()
+    user_words = user_text.split()
 
-    # ---- 1. KEYWORD FILTERING ----
-    matched_clubs = []
-
+    # -------------------------------------------------
+    # FILTERING LOGIC: keyword scoring
+    # -------------------------------------------------
+    matched = []
     for club in CLUBS:
         score = 0
+        for w in user_words:
+            if w in club["name"].lower():
+                score += 2
+            if any(w in tag.lower() for tag in club["tags"]):
+                score += 3
+            if w in club["description"].lower():
+                score += 1
 
-        # match by name, tags, etc.
-        ...
-        # your filtering code stays the same
-        ...
+        if score > 0:
+            matched.append((score, club))
 
-    matched_clubs.sort(reverse=True, key=lambda x: x[0])
-    filtered_clubs = [club for score, club in matched_clubs][:5]
+    # Sort by decreasing score
+    matched = sorted(matched, reverse=True, key=lambda x: x[0])
 
+    # Keep TOP 3 best matched clubs
+    filtered_clubs = [club for score, club in matched][:3]
+
+    # Fallback if none matched
     if not filtered_clubs:
-        filtered_clubs = CLUBS
+        filtered_clubs = CLUBS[:3]
 
 
-    # ⭐⭐ PUT THE SYSTEM PROMPT RIGHT HERE ⭐⭐
+    # -------------------------------------------------
+    # SYSTEM PROMPT — strict rules
+    # -------------------------------------------------
     system_prompt = f"""
-You recommend UVA clubs based ONLY on the list below.
+You are CavaLink-GPT, an assistant that recommends UVA clubs.
 
-STUDENT INTERESTS: "{user_text}"
+RULES:
+1. You MUST only recommend clubs from the list below.
+2. Recommend ONLY the top 2–3 clubs that best match the user’s interests.
+3. Keep each recommendation SHORT (1–2 sentences).
+4. Do NOT invent clubs. Do NOT modify their names.
+5. NEVER output any club not shown below.
+6. Final format (exact):
+Club Name: Explanation.
+Club Name: Explanation.
 
-CLUB OPTIONS:
+Here are the ONLY clubs you are allowed to choose from:
 {json.dumps(filtered_clubs, indent=2)}
 
-Respond with ONLY 2–4 clubs that best match the student's interests.
-Each response MUST follow this format exactly:
-
-- Club Name: 1–2 sentence explanation.
-- Club Name: explanation.
-
-No extra text. No instructions. No steps. No commentary.
-Begin now.
+User interests: "{user_text}"
 """
 
-    # ---- OLLAMA CALL ----
+
+    # -------------------------------------------------
+    # CALL OLLAMA
+    # -------------------------------------------------
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": system_prompt,
@@ -95,6 +123,11 @@ Begin now.
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
+# -----------------------------------------------------
+# RUN FLASK
+# -----------------------------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
