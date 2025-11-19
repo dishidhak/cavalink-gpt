@@ -8,8 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src ./src
 COPY assets ./assets
-COPY frontend ./frontend   # <-- YOU MUST ADD THIS LINE
+COPY frontend ./frontend
 
 EXPOSE 5000
 
 CMD ["python", "src/app.py"]
+
