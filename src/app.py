@@ -51,65 +51,69 @@ def chat():
     user_words = user_text.split()
 
     # -------------------------------------------------
-    # FILTERING LOGIC: keyword scoring
+    # 1. FILTER CLUBS BY KEYWORDS
     # -------------------------------------------------
     matched = []
     for club in CLUBS:
         score = 0
-        for w in user_words:
-            if w in club["name"].lower():
-                score += 2
-            if any(w in tag.lower() for tag in club["tags"]):
+
+        for word in user_words:
+            if any(word in tag.lower() for tag in club["tags"]):
                 score += 3
-            if w in club["description"].lower():
+            if word in club["description"].lower():
+                score += 2
+            if word in club["name"].lower():
                 score += 1
 
         if score > 0:
             matched.append((score, club))
 
-    # Sort by decreasing score
-    matched = sorted(matched, reverse=True, key=lambda x: x[0])
-
-    # Keep TOP 3 best matched clubs
+    matched.sort(reverse=True, key=lambda x: x[0])
     filtered_clubs = [club for score, club in matched][:3]
 
-    # Fallback if none matched
     if not filtered_clubs:
-        filtered_clubs = CLUBS[:3]
+        filtered_clubs = CLUBS[:2]
 
 
     # -------------------------------------------------
-    # SYSTEM PROMPT — strict rules
+    # 2. SYSTEM PROMPT (STRICT RULES)
     # -------------------------------------------------
-    system_prompt = f"""
+    system_prompt = """
 You are CavaLink-GPT, an assistant that recommends UVA clubs.
 
 RULES:
-1. You MUST only recommend clubs from the list below.
-2. Recommend ONLY the top 2–3 clubs that best match the user’s interests.
-3. Keep each recommendation SHORT (1–2 sentences).
-4. Do NOT invent clubs. Do NOT modify their names.
-5. NEVER output any club not shown below.
-6. Final format (exact):
-Club Name: Explanation.
-Club Name: Explanation.
+1. ONLY choose from the clubs listed below—never invent clubs.
+2. Recommend the top 2–3 clubs that best match the user’s interests.
+3. Keep explanations short (1–2 sentences).
+4. Output format (exactly):
 
-Here are the ONLY clubs you are allowed to choose from:
-{json.dumps(filtered_clubs, indent=2)}
-
-User interests: "{user_text}"
+Club Name: Short explanation.
+Club Name: Short explanation.
 """
 
+    # -------------------------------------------------
+    # 3. FULL PROMPT SENT TO TINYLLAMA
+    # -------------------------------------------------
+    full_prompt = f"""
+{system_prompt}
 
-    # -------------------------------------------------
-    # CALL OLLAMA
-    # -------------------------------------------------
+User interests: "{user_text}"
+
+Available clubs you may choose from:
+{json.dumps(filtered_clubs, indent=2)}
+
+Now follow the RULES and produce clean recommendations.
+"""
+
     payload = {
         "model": OLLAMA_MODEL,
-        "prompt": system_prompt,
+        "prompt": full_prompt,
         "stream": False
     }
 
+    # -------------------------------------------------
+    # 4. CALL TINYLLAMA
+    # -------------------------------------------------
     try:
         response = requests.post(f"{OLLAMA_URL}/api/generate", json=payload)
         data = response.json()
