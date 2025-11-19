@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+
+  backend:
+    build: .
+    container_name: cavalink-backend
+    ports:
+      - "5000:5000"
+    environment:
+      OLLAMA_URL: "http://ollama:11434"
+    depends_on:
+      - ollama
+
+volumes:
+  ollama:
