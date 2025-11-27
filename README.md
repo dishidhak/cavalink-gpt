@@ -1,3 +1,23 @@
 FINAL CASE STUDY WRITE UP
+
+EXECUTIVE SUMMARY
 1) Problem: UVA has hundreds of student organizations, but most first-years—and many upper-class students—struggle to find clubs that actually match their interests. Browsing long lists on HoosInvolved is overwhelming, out-of-date, and not personalized. Students want a simple way to discover communities that fit their hobbies, identities, and goals.
 2) Solution: CavaLink-GPT is a chatbot UVA club-recommender. It uses a Flask API, rule-based retrieval, and a compact local LLM (TinyLlama running through Ollama) to generate conversational, personalized club suggestions. Students describe what they enjoy (“I like dance and consulting”), and the system returns tailored matches from club data. Everything runs locally inside Docker for portability and reproducibility
+
+SYSTEM OVERVIEW
+
+
+HOW TO RUN (LOCAL)
+
+
+DESIGN DECISIONS
+
+
+RESULTS AND EVALUATION
+
+
+WHAT'S NEXT
+
+
+LINKS 
+GitHub Repo: https://github.com/dishidhak/cavalink-gpt.git
