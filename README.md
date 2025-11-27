@@ -33,4 +33,5 @@ WHAT'S NEXT
 - Create an admin dashboard for adding/editing club info through a simple interface rather than editing Python files.
 
 LINKS 
+
 GitHub Repo: https://github.com/dishidhak/cavalink-gpt.git
