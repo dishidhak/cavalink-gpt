@@ -7,7 +7,8 @@
 ## SYSTEM OVERVIEW
 Course Concept(s): REST APIs (Flask), Containerization (Docker), Frontend to Backend integration
 
-Architecture Diagram: Include a PNG in /assets and embed it here.
+Architecture Diagram: ![Architecture Diagram]("assets/architecture diagram.png")
+
 
 Data/Models/Services: 
 
