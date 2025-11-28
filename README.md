@@ -6,8 +6,14 @@
 
 ## SYSTEM OVERVIEW
 Course Concept(s): REST APIs (Flask microservice), Containerization (Docker), Frontend to Backend integration
+
 Architecture Diagram: Include a PNG in /assets and embed it here.
-Data/Models/Services: CavaLink-GPT does not use external datasets or files. All club information is stored directly in Python as a hard-coded list of dictionaries containing each club’s name, category, tags, and description. This keeps the system lightweight and easy to run in a container. Data size is approximately 20–100 entries.
+
+Data/Models/Services: 
+
+The primary data source for this project is a manually created JSON file, assets/clubs.json, which contains structured information about student organizations at UVA that was manually pulled from the organizations section on the Hoos Involved website. The file includes each club’s name, category, tags, and description, allowing the system to understand relevant attributes such as academic focus, cultural affiliation, performance type, or general interests. Because the dataset is fully custom-built and locally stored, it has no external licensing restrictions and remains lightweight, easy to load, and simple to maintain.
+
+My project does not use any external machine learning models or LLMs. Instead, the system relies on a deterministic, rule-based keyword-matching model implemented directly in Flask. When a user submits text, the backend scans the query for keywords and compares them against the club’s name, category, tags, and description. Any club containing a matching keyword is returned as a recommendation. This approach ensures zero hallucinations, full transparency, and consistent results while avoiding the complexity or cost of external APIs. The backend Flask API is responsible for parsing user input, performing the search, and returning structured JSON responses, while a lightweight frontend interface handles user interaction.
 
 ## HOW TO RUN
 
