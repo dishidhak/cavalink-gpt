@@ -10,10 +10,15 @@ Architecture Diagram: Include a PNG in /assets and embed it here.
 Data/Models/Services: CavaLink-GPT does not use external datasets or files. All club information is stored directly in Python as a hard-coded list of dictionaries containing each club’s name, category, tags, and description. This keeps the system lightweight and easy to run in a container. Data size is approximately 20–100 entries.
 
 ## HOW TO RUN
-Please run locally! 
 
+Please run locally! 
+'''
 docker build -t cavalink-gpt .
 docker run --rm -p 5000:5000 cavalink-gpt
+# Health Check
+curl http://localhost:5000/health
+'''
+
 
 ## DESIGN DECISIONS
 Why this concept? Alternatives considered and why not chosen.
