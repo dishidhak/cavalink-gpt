@@ -24,52 +24,39 @@ with open(os.path.join(BASE_DIR, "assets/clubs.json"), "r") as f:
 def health():
     return jsonify({"status": "ok"})
 
-# ===============================
-# NO-LLM, NO-HALLUCINATION MATCHING
-# ===============================
-KEYWORD_MAP = {
-    "dance": ["Virginia Ke Aashiq (VKA)", "Hoo-Raas"],
-    "korean": ["Korean Student Association (KSA)"],
-    "consulting": ["SEED Consulting", "180 Degrees Consulting"],
-    "coding": ["Girls Who Code (GWC)", "HooHacks"],
-    "data": ["Data Science and Analytics Club (DSAC)"],
-    "music": ["Virginia Belles", "Cavalier Marching Band"],
-    "journalism": ["Cavalier Daily"],
-    "swim": ["Club Swim at UVA"],
-    "finance": ["Alternative Investment Fund (AIF)"],
-    "debate": ["Jefferson Society"],
-    "garba": ["Hoo-Raas"],
-    "raas": ["Hoo-Raas"],
-    "bollywood": ["Virginia Ke Aashiq (VKA)"]
-}
-
 @app.post("/api/chat")
 def chat():
     user_text = request.json.get("text", "").lower().strip()
     words = user_text.split()
 
-    matched = []
+    matches = []
 
-    # Determine matching clubs
-    for w in words:
-        if w in KEYWORD_MAP:
-            matched = KEYWORD_MAP[w]
-            break
+    for club in CLUBS:
+        searchable_text = (
+            club["name"] + " " +
+            club["category"] + " " +
+            " ".join(club.get("tags", [])) + " " +
+            club.get("description", "")
+        ).lower()
 
-    # Fallback if nothing matched
-    if not matched:
-        return jsonify({"error": "no clubs that match your description"}), 200
+        # Check if ANY user word appears in the club's searchable text
+        if any(word in searchable_text for word in words):
+            matches.append(club)
 
-    # Return ONLY club names + descriptions
+    if not matches:
+        return jsonify({"No clubs match your description. Please try entering another keyword."}), 200
+
+    # Format response
     output = [
         {
-            "name": c["name"],
-            "description": c["description"]
+            "name": club["name"],
+            "description": club["description"]
         }
-        for c in CLUBS if c["name"] in matched
+        for club in matches
     ]
 
-    return jsonify(output)
+    return jsonify(output), 200
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
