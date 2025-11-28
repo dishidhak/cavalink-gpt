@@ -36,7 +36,7 @@ More advanced options—like using an LLM, embeddings, or a database—were not 
 
 
 ## RESULTS AND EVALUATION
-
+![Example Output](assets/exampleoutput.png)
 
 ## WHAT'S NEXT
 - Expand the club dataset by adding more organizations and richer tags so recommendations become more accurate and comprehensive.
