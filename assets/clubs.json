@@ -94,6 +94,103 @@
     "category": "athletics",
     "tags": ["swimming", "fitness", "sports", "competition"],
     "description": "A competitive and recreational swim club for students of all levels."
+  },
+  {
+    "name": "UVA DiShaan",
+    "category": "cultural",
+    "tags": ["dance", "south asian", "fusion", "performance"],
+    "description": "A South Asian fusion dance organization performing modern and classical styles at UVA events."
+  },
+  {
+    "name": "UVA Rocketry Club",
+    "category": "academic",
+    "tags": ["engineering", "aerospace", "rocketry", "design"],
+    "description": "A student engineering team focused on high-powered rocketry design, launches, and aerospace innovation."
+  },
+  {
+    "name": "Muslim Student Association (MSA)",
+    "category": "cultural",
+    "tags": ["muslim", "faith", "religion", "community"],
+    "description": "A religious and cultural group supporting Muslim students and hosting educational and spiritual events."
+  },
+  {
+    "name": "Hindu Student Association (HSA)",
+    "category": "cultural",
+    "tags": ["hindu", "faith", "religion", "culture"],
+    "description": "A Hindu faith and cultural organization promoting community, worship, and traditional celebrations."
+  },
+  {
+    "name": "Young Life",
+    "category": "religious",
+    "tags": ["christian", "faith", "fellowship", "community"],
+    "description": "A Christian fellowship group offering mentorship, small groups, and faith-based community building."
+  },
+  {
+    "name": "Asian Student Network at McIntire",
+    "category": "professional",
+    "tags": ["asian", "business", "mcintire", "networking"],
+    "description": "A professional and cultural organization that supports Asian students in business and commerce at McIntire."
+  },
+  {
+    "name": "Association for Computing Machinery (ACM)",
+    "category": "academic",
+    "tags": ["computer science", "coding", "technology", "software"],
+    "description": "UVA’s primary computer science organization offering workshops, coding events, and technical career support."
+  },
+  {
+    "name": "Black Law Students Association (BLSA)",
+    "category": "professional",
+    "tags": ["law", "black students", "advocacy", "professional"],
+    "description": "An organization supporting Black law students through mentorship, advocacy, and academic and career resources."
+  },
+  {
+    "name": "Cavalier Symphony Orchestra",
+    "category": "performing arts",
+    "tags": ["music", "orchestra", "strings", "performance"],
+    "description": "A student symphony orchestra performing classical and contemporary works at UVA."
+  },
+  {
+    "name": "East Coast Showdown",
+    "category": "athletics",
+    "tags": ["dance", "competition", "showdown", "performance"],
+    "description": "A competitive collegiate dance showcase event organized by UVA students."
+  },
+  {
+    "name": "Madison House",
+    "category": "service",
+    "tags": ["volunteering", "service", "community", "outreach"],
+    "description": "UVA’s largest student-run volunteer organization offering numerous service and outreach programs."
+  },
+  {
+    "name": "Vietnamese Student Association (VSA)",
+    "category": "cultural",
+    "tags": ["vietnamese", "culture", "asian", "community"],
+    "description": "A cultural group celebrating Vietnamese traditions and promoting community among students."
+  },
+  {
+    "name": "Somali Student Association (SSA)",
+    "category": "cultural",
+    "tags": ["somali", "african", "culture", "community"],
+    "description": "An organization representing Somali culture, heritage, and student community on Grounds."
+  },
+  {
+    "name": "Swifties at UVA",
+    "category": "social",
+    "tags": ["music", "taylor swift", "pop culture", "social"],
+    "description": "A fun social club for students who enjoy Taylor Swift’s music, pop culture, and community events."
+  },
+  {
+    "name": "The Baking Club at UVA",
+    "category": "social",
+    "tags": ["baking", "food", "community", "social"],
+    "description": "A student club for people who enjoy baking, sharing recipes, and hosting food-focused social events."
+  },
+  {
+    "name": "The Jefferson Literary and Debating Society",
+    "category": "academic",
+    "tags": ["debate", "public speaking", "history", "literary"],
+    "description": "UVA’s historic debating society promoting intellectual discourse, debate, and literary engagement since 1825."
   }
 ]
+
 
