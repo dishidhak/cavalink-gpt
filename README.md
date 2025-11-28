@@ -12,12 +12,12 @@ Data/Models/Services: CavaLink-GPT does not use external datasets or files. All 
 ## HOW TO RUN
 
 Please run locally! 
-'''
+```
 docker build -t cavalink-gpt .
 docker run --rm -p 5000:5000 cavalink-gpt
 # Health Check
 curl http://localhost:5000/health
-'''
+```
 
 
 ## DESIGN DECISIONS
