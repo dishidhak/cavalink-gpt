@@ -7,7 +7,7 @@
 ## SYSTEM OVERVIEW
 Course Concept(s): REST APIs (Flask), Containerization (Docker), Frontend to Backend integration
 
-Architecture Diagram: ![Architecture Diagram]("assets/architecture diagram.png")
+Architecture Diagram: ![Architecture Diagram]("assets/architecturediagram.png")
 
 
 Data/Models/Services: 
