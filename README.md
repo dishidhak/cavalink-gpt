@@ -32,6 +32,6 @@ Ops: Logs/metrics, scaling considerations, known limitations.
 - Deploy to the cloud (Render, Fly.io, or GitHub Pages + backend hosting) for public demos outside of Docker.
 - Create an admin dashboard for adding/editing club info through a simple interface rather than editing Python files.
 
-LINKS 
+## LINKS 
 
 GitHub Repo: https://github.com/dishidhak/cavalink-gpt.git
