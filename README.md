@@ -30,10 +30,10 @@ curl http://localhost:5000/health
 
 
 ## DESIGN DECISIONS
-Why this concept? Alternatives considered and why not chosen.
-Tradeoffs: Performance, cost, complexity, maintainability.
-Security/Privacy: Secrets mgmt, input validation, PII handling.
-Ops: Logs/metrics, scaling considerations, known limitations.
+This project uses a simple keyword-matching system because it is the easiest, most reliable way to recommend clubs without relying on large models or external services. The Flask backend takes whatever the user types, compares those words to the club names, categories, tags, and descriptions in the clubs.json file, and returns any clubs that match. This approach keeps the system fast, predictable, and easy to understand. Since the data is stored locally in one small JSON file, there’s nothing complicated to set up, no internet dependency, and no risk of the model making things up and hallucinating clubs that do not exist. When I was using Ollama, my chatbot kept hallucinating and making a lot of spelling errors, which was really difficult to troubleshoot.
+
+More advanced options—like using an LLM, embeddings, or a database—were not chosen because they add complexity without improving results for such a small dataset. The current design is easy to maintain: adding a new club only requires adding one entry to the JSON file, and the matching system automatically picks it up. Security concerns are minimal since no user data is stored and there are no secret keys or APIs involved. The system also runs cleanly inside Docker and is simple to debug, with the only main limitation being that keyword matching cannot understand deeper meaning or context like an AI model would—but this tradeoff is acceptable for this project’s scope.
+
 
 ## RESULTS AND EVALUATION
 
