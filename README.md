@@ -15,7 +15,7 @@ Please run locally!
 ```
 docker build -t cavalink-gpt .
 docker run --rm -p 5000:5000 cavalink-gpt
-# Health Check
+# health Check
 curl http://localhost:5000/health
 ```
 
