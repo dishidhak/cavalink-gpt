@@ -5,7 +5,7 @@
 2) Solution: CavaLink-GPT is a chatbot UVA club-recommender. It uses a Flask API and rule-based retrieval to generate conversational, personalized club suggestions. Students describe what they enjoy (“I like dance and consulting”), and the system returns tailored matches from club data using keyword matching. Everything runs locally inside Docker for portability and reproducibility.
 
 ## HOW TO PROMPT THE CHATBOT
-Prompt CavaLink-GPT with a single keyword, like "dance", "consulting", or "journalism"!
+Prompt CavaLink-GPT with a single keyword, like "dance", "consulting", or "journalism".
 
 ## SYSTEM OVERVIEW
 Course Concept(s): REST APIs (Flask), Containerization (Docker), Frontend to Backend integration
