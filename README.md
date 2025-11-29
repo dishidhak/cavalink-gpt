@@ -1,18 +1,14 @@
 # FINAL CASE STUDY WRITE UP
 
 ## EXECUTIVE SUMMARY
-1) Problem: UVA has hundreds of student organizations, but most first-years—and many upper-class students—struggle to find clubs that actually match their interests. Browsing long lists on HoosInvolved is overwhelming, out-of-date, and not personalized. Students want a simple way to discover communities that fit their hobbies, identities, and goals.
-2) Solution: CavaLink-GPT is a chatbot UVA club-recommender. It uses a Flask API and rule-based retrieval to generate conversational, personalized club suggestions. Students describe what they enjoy (“I like dance and consulting”), and the system returns tailored matches from club data using keyword matching. Everything runs locally inside Docker for portability and reproducibility.
-
-## HOW TO PROMPT THE CHATBOT
-Prompt CavaLink-GPT with a single keyword, like "dance", "consulting", or "journalism".
+1) Problem: UVA has hundreds of student organizations, but most first-years (and even upper-class students) struggle to navigate the hundreds of clubs and organizations at UVA, and find ones that actually match their interests. Browsing long lists on HoosInvolved is overwhelming and outdated. Students want a simple way to discover communities that fit their hobbies, identities, and goals.
+2) Solution: CavaLink-GPT is a chatbot UVA club-recommender. It uses a Flask API and rule-based retrieval to return club suggestions. Students **prompt CavaLink-GPT with a single keyword, like "dance", "consulting", or "journalism", and the system returns tailored matches from club data using keyword matching**. Everything runs locally inside Docker for portability and reproducibility.
 
 ## SYSTEM OVERVIEW
 Course Concept(s): REST APIs (Flask), Containerization (Docker), Frontend to Backend integration
 
 Architecture Diagram: 
 ![Architecture Diagram](assets/architecturediagram.png)
-
 
 
 Data/Models/Services: 
@@ -35,7 +31,7 @@ curl http://localhost:5000/health
 ## DESIGN DECISIONS
 This project uses a simple keyword-matching system because it is the easiest, most reliable way to recommend clubs without relying on large models or external services. The Flask backend takes whatever the user types, compares those words to the club names, categories, tags, and descriptions in the clubs.json file, and returns any clubs that match. This approach keeps the system fast, predictable, and easy to understand. Since the data is stored locally in one small JSON file, there’s nothing complicated to set up, no internet dependency, and no risk of the model making things up and hallucinating clubs that do not exist. When I was using Ollama, my chatbot kept hallucinating and making a lot of spelling errors, which was really difficult to troubleshoot.
 
-More advanced options—like using an LLM, embeddings, or a database—were not chosen because they add complexity without improving results for such a small dataset. The current design is easy to maintain: adding a new club only requires adding one entry to the JSON file, and the matching system automatically picks it up. Security concerns are minimal since no user data is stored and there are no secret keys or APIs involved. The system also runs cleanly inside Docker and is simple to debug, with the only main limitation being that keyword matching cannot understand deeper meaning or context like an AI model would—but this tradeoff is acceptable for this project’s scope.
+More advanced options—like using an LLM, embeddings, or a database—were not chosen because they add complexity without improving results for such a small dataset. The current design is easy to maintain: adding a new club only requires adding one entry to the JSON file, and the matching system automatically picks it up. Security concerns are minimal since no user data is stored and there are no secret keys or APIs involved. The system also runs cleanly inside Docker and is simple to debug, with the only main limitation being that keyword matching cannot understand deeper meaning or context like an AI model would.
 
 
 ## RESULTS AND EVALUATION
